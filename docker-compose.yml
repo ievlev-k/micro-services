@@ -42,6 +42,17 @@ services:
 #      - POSTGRES_USER=postgres
 #      - POSTGRES_DB=postgres
 
+  config:
+    build:
+      context: config
+      dockerfile: Dockerfile
+      target: run
+    container_name: config
+    ports:
+      - "8888:8888"
+
+
+
   gateway:
     build:
       context: gateway
@@ -52,6 +63,9 @@ services:
       - "8082:8082"
     environment:
       eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+      spring.config.import: configserver:http://config:8888
+    depends_on:
+      - config
 
   eureka:
     build:
@@ -63,7 +77,9 @@ services:
       - "8081:8081"
     environment:
       eureka.client.service-url.defaultZone: http://localhost:8081/eureka
-
+      spring.config.import: configserver:http://config:8888
+    depends_on:
+      - config
 
   product:
     build:
@@ -72,6 +88,7 @@ services:
       target: run
     container_name: product
     depends_on:
+      - config
       - eureka
       - db
     ports:
@@ -79,7 +96,7 @@ services:
     environment:
       eureka.client.service-url.defaultZone: http://eureka:8081/eureka
       spring.datasource.url: jdbc:postgresql://db:5432/postgres
-
+      spring.config.import: configserver:http://config:8888
 #      spring.config.import: configserver:http://config:8888
 #      pushgateway.base-url: 172.17.0.1:9092
 #      spring.zipkin.baseUrl: http://172.17.0.1:9411
@@ -92,14 +109,32 @@ services:
       target: run
     container_name: order
     depends_on:
+      - config
       - eureka
       - db
     ports:
       - "8085:8085"
     environment:
       eureka.client.service-url.defaultZone: http://eureka:8081/eureka
-      spring.datasource.url: jdbc:postgresql://db:5432/postgres
+      spring.config.import: configserver:http://config:8888
+#      spring.datasource.url: jdbc:postgresql://db:5432/postgres
 
+  user:
+    build:
+      context: user-server
+      dockerfile: Dockerfile
+      target: run
+    container_name: user
+    depends_on:
+      - config
+      - eureka
+      - db
+    ports:
+      - "8086:8086"
+    environment:
+      spring.config.import: configserver:http://config:8888
+      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+      spring.datasource.url: jdbc:postgresql://db:5432/postgres
 
   db:
     image: postgres:14

@@ -9,13 +9,13 @@ import ru.itmp.productserver.dto.request.ProductRequest;
 import ru.itmp.productserver.dto.responce.ProductResponse;
 import ru.itmp.productserver.dto.update.ProductUpdate;
 import ru.itmp.productserver.exeptions.ObjectNotFoundException;
+import ru.itmp.productserver.feign.AuthFeignClient;
 import ru.itmp.productserver.mapper.ProductMapper;
 import ru.itmp.productserver.model.Product;
 import ru.itmp.productserver.model.Attachment;
 import ru.itmp.productserver.repository.AttachmentRepository;
 import ru.itmp.productserver.repository.CategoryRepository;
 import ru.itmp.productserver.repository.ProductRepository;
-import ru.itmp.productserver.repository.UserRepository;
 import ru.itmp.productserver.services.ProductService;
 
 
@@ -30,16 +30,18 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final AttachmentRepository attachmentRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
+
 
     private final ProductMapper productMapper;
-
+    private final AuthFeignClient authFeignClient;
 
     @Override
     public ProductResponse save(ProductRequest productRequest) {
 
-        userRepository.findById(productRequest.getUserId())
-                .orElseThrow(() -> new ObjectNotFoundException("UserId: " + productRequest.getUserId() + " does not exist!"));
+        if (!authFeignClient.findUserById(productRequest.getUserId())){
+            throw new ObjectNotFoundException("UserId: " + productRequest.getUserId() + " does not exist!");
+        }
+
 
         categoryRepository.findById(productRequest.getCategoryId())
                 .orElseThrow(() -> new ObjectNotFoundException("Category does not exist"));

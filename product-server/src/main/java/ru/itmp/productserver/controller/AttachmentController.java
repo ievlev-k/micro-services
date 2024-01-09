@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.itmp.productserver.dto.request.AttachmentRequest;
 import ru.itmp.productserver.dto.responce.AttachmentResponse;
@@ -27,37 +28,37 @@ public class AttachmentController {
     }
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public AttachmentResponse addAttachment(@Valid @RequestBody AttachmentRequest attachmentRequest) {
         return attachmentService.save(attachmentRequest);
     }
 
     @GetMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public Page<AttachmentResponse> getListAttachment(@PageableDefault(size = 5) Pageable pageable) {
         return attachmentService.getAllPage(pageable);
     }
 
     @GetMapping("/all")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public List<AttachmentResponse> getAllAttachment() {
         return attachmentService.getAllList();
     }
 
     @PutMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public AttachmentResponse updateAttachment(@Valid @RequestBody AttachmentUpdate attachmentUpdate) {
         return attachmentService.update(attachmentUpdate);
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public AttachmentResponse getAttachmentDetail(@PathVariable Long id) {
         return attachmentService.findAttachmentById(id);
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public void deleteAttachment(@PathVariable Long id) {
         attachmentService.deleteById(id);
     }

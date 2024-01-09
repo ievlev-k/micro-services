@@ -10,13 +10,12 @@ import ru.itmo.orderserver.dto.request.OrderRequest;
 import ru.itmo.orderserver.dto.response.OrderResponse;
 import ru.itmo.orderserver.dto.update.OrderUpdate;
 import ru.itmo.orderserver.exeptions.ObjectNotFoundException;
-import ru.itmo.orderserver.feight.ProductFeignClient;
+import ru.itmo.orderserver.feign.ProductFeignClient;
 import ru.itmo.orderserver.mapper.OrderMapper;
 import ru.itmo.orderserver.model.Order;
 import ru.itmo.orderserver.model.Product;
 import ru.itmo.orderserver.repository.OrderRepository;
 import ru.itmo.orderserver.repository.PaymentRepository;
-import ru.itmo.orderserver.repository.ProductRepository;
 import ru.itmo.orderserver.services.OrderService;
 
 import java.util.List;
@@ -30,7 +29,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
-    private final ProductRepository productRepository;
     private final ProductFeignClient productFeignClient;
 
 
@@ -80,10 +78,10 @@ public class OrderServiceImpl implements OrderService {
         List<Long> productIdsByOrder = order.getProducts().stream().map(Product::getId).collect(Collectors.toList());
         productIds.removeAll(productIdsByOrder);
 //        List<Product> products = productFeignClient.getAllProductsByIds(productIds);
-        String products = productFeignClient.getAllProductsByIds(productIds);
-        System.out.println(products);
-//        order.getProducts().addAll(products);
-//        orderRepository.save(order);
+        List<Product> products = productFeignClient.getAllProductsByIds(productIds);
+        System.out.println(products.size());
+        order.getProducts().addAll(products);
+        orderRepository.save(order);
     }
 
 

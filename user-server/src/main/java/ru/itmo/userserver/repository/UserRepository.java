@@ -1,10 +1,10 @@
-package ru.itmp.productserver.repository;
+package ru.itmo.userserver.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.itmp.productserver.model.User;
-
+import ru.itmo.userserver.model.User;
+;
 
 import java.util.Optional;
 
