@@ -32,8 +32,8 @@ public class UserController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public List<UserResponse> getAllUsers(@RequestHeader("Authorization") String token) {
-        System.out.println(token);
+    public List<UserResponse> getAllUsers() {
+//        System.out.println(token);
         return userService.getAllList();
     }
 
