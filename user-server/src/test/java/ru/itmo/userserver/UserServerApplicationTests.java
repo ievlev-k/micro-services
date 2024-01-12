@@ -12,11 +12,10 @@ import ru.itmo.userserver.init.Postgres;
 
 
 @ActiveProfiles("test")
-@SpringBootTest
+@SpringBootTest(classes = UserServerApplication.class)
 @ContextConfiguration(initializers = {
         Postgres.Initializer.class
 })
-@PropertySource("/application-test.properties")
 @Transactional
 public class UserServerApplicationTests {
 

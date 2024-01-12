@@ -43,8 +43,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
 
-        categoryRepository.findById(productRequest.getCategoryId())
-                .orElseThrow(() -> new ObjectNotFoundException("Category does not exist"));
+        categoryRepository.findById(productRequest.getCategoryId()).blockOptional().orElseThrow(() -> new ObjectNotFoundException("Category does not exist"));
+
 
         Product product = productMapper.productRequestToProduct(productRequest);
         return productMapper.productToProductResponse(productRepository.save(product));

@@ -8,6 +8,8 @@ import org.springframework.data.web.PageableDefault;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.itmp.productserver.dto.request.CategoryRequest;
 import ru.itmp.productserver.dto.responce.CategoryResponse;
 import ru.itmp.productserver.dto.update.CategoryUpdate;
@@ -26,38 +28,38 @@ public class CategoryController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public CategoryResponse addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+    public Mono<CategoryResponse> addCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         return categoryService.save(categoryRequest);
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Page<CategoryResponse> getListCategory(@PageableDefault(size = 5) Pageable pageable) {
+    public Mono<Page<CategoryResponse>> getListCategory(@PageableDefault(size = 5) Pageable pageable) {
         return categoryService.getAllPage(pageable);
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public List<CategoryResponse> getAllCategory() {
+    public Flux<CategoryResponse> getAllCategory() {
         return categoryService.getAllList();
     }
 
     @PutMapping
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public CategoryResponse updateCategory(@Valid @RequestBody CategoryUpdate categoryUpdate) {
+    public Mono<CategoryResponse> updateCategory(@Valid @RequestBody CategoryUpdate categoryUpdate) {
         return categoryService.update(categoryUpdate);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public CategoryResponse getCategoryDetail(@PathVariable Long id) {
+    public Mono<CategoryResponse> getCategoryDetail(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public void deleteCategory(@PathVariable Long id) {
-        categoryService.deleteById(id);
-    }
+//    @DeleteMapping("/{id}")
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+//    public void deleteCategory(@PathVariable Long id) {
+//        categoryService.deleteById(id);
+//    }
 
 }

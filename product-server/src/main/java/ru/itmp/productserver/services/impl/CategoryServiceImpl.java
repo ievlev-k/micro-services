@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.itmp.productserver.dto.request.CategoryRequest;
 import ru.itmp.productserver.dto.responce.CategoryResponse;
 import ru.itmp.productserver.dto.update.CategoryUpdate;
@@ -13,6 +15,7 @@ import ru.itmp.productserver.mapper.CategoryMapper;
 import ru.itmp.productserver.model.Category;
 import ru.itmp.productserver.repository.CategoryRepository;
 import ru.itmp.productserver.services.CategoryService;
+import org.springframework.data.domain.PageImpl;
 
 
 import java.util.List;
@@ -24,37 +27,47 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public CategoryResponse save(CategoryRequest categoryRequest) {
+    public Mono<CategoryResponse> save(CategoryRequest categoryRequest) {
+
+
         Category category = categoryMapper.categoryRequestToCategory(categoryRequest);
-        return categoryMapper.categoryToCategoryResponse(categoryRepository.save(category));
+        return categoryRepository.save(category).map(categoryMapper::categoryToCategoryResponse);
     }
 
     @Override
-    public Page<CategoryResponse> getAllPage(Pageable pageable) {
-        return categoryMapper.categoryToCategoryResponsePage(categoryRepository.findAll(pageable));
+    public Mono<Page<CategoryResponse>> getAllPage(Pageable pageable) {
+
+        return createPage(categoryRepository.findAll().map(categoryMapper::categoryToCategoryResponse), pageable);
+    }
+
+    private Mono<Page<CategoryResponse>> createPage(Flux<CategoryResponse> categoryFlux, Pageable pageable) {
+        return categoryFlux
+                .collectList()
+                .zipWith(categoryRepository.count())
+                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 
     @Override
-    public List<CategoryResponse> getAllList() {
-        return categoryMapper.categoryToCategoryResponseList(categoryRepository.findAll());
+    public Flux<CategoryResponse> getAllList() {
+        return categoryRepository.findAll().map(categoryMapper::categoryToCategoryResponse);
+//        return categoryMapper.categoryToCategoryResponseList(categoryRepository.findAll().);
     }
 
-    @Override
-    public void deleteById(Long id) {
-        categoryRepository.deleteById(id);
-    }
+//    @Override
+//    public void deleteById(Long id) {
+//        categoryRepository.deleteById(id);
+//    }
 
     @Override
-    public CategoryResponse update(CategoryUpdate categoryUpdate) {
+    public Mono<CategoryResponse> update(CategoryUpdate categoryUpdate) {
         Category category = categoryMapper.categoryUpdateToCategory(categoryUpdate);
-        return categoryMapper.categoryToCategoryResponse(categoryRepository.save(category));
+        return categoryRepository.save(category).map(categoryMapper::categoryToCategoryResponse);
+
     }
 
     @Override
-    public CategoryResponse getCategoryById(Long id) {
-        return categoryMapper.categoryToCategoryResponse(categoryRepository
-                .findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Category with id " + id + " not found"))
-        );
+    public Mono<CategoryResponse> getCategoryById(Long id) {
+        return categoryRepository.findById(id).map(categoryMapper::categoryToCategoryResponse );
+
     }
 }
