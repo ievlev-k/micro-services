@@ -5,42 +5,42 @@ networks:
   test:
 
 services:
-#  test_app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#      target: run_test
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    network_mode: host
-#
-#  app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#      target: run
-#    ports:
-#      - "18080:8090"
-#    environment:
-#      spring.datasource.url: "jdbc:postgresql://db:5432/postgres"
-#    depends_on:
-#      test_app:
-#        condition: service_completed_successfully
-#      db:
-#        condition: service_healthy
-#    networks:
-#      - test
-#  #    network_mode: host
+  #  test_app:
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile
+  #      target: run_test
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  #    network_mode: host
+  #
+  #  app:
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile
+  #      target: run
+  #    ports:
+  #      - "18080:8090"
+  #    environment:
+  #      spring.datasource.url: "jdbc:postgresql://db:5432/postgres"
+  #    depends_on:
+  #      test_app:
+  #        condition: service_completed_successfully
+  #      db:
+  #        condition: service_healthy
+  #    networks:
+  #      - test
+  #  #    network_mode: host
 
-#  user_db:
-#    image: postgres:14
-#    container_name: user_db
-#    ports:
-#      - "5002:5432"
-#    environment:
-#      - POSTGRES_PASSWORD=postgres
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_DB=postgres
+  #  user_db:
+  #    image: postgres:14
+  #    container_name: user_db
+  #    ports:
+  #      - "5002:5432"
+  #    environment:
+  #      - POSTGRES_PASSWORD=postgres
+  #      - POSTGRES_USER=postgres
+  #      - POSTGRES_DB=postgres
 
   config:
     build:
@@ -50,22 +50,10 @@ services:
     container_name: config
     ports:
       - "8888:8888"
+    networks:
+      - test
 
 
-
-  gateway:
-    build:
-      context: gateway
-      dockerfile: Dockerfile
-      target: run
-    container_name: gateway
-    ports:
-      - "8082:8082"
-    environment:
-      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
-      spring.config.import: configserver:http://config:8888
-    depends_on:
-      - config
 
   eureka:
     build:
@@ -80,7 +68,26 @@ services:
       spring.config.import: configserver:http://config:8888
     depends_on:
       - config
+    networks:
+      - test
 
+  gateway:
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+      target: run
+    container_name: gateway
+    ports:
+      - "8082:8082"
+    environment:
+      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+      spring.config.import: configserver:http://config:8888
+    depends_on:
+      - eureka
+      - config
+    networks:
+      - test
+  #
   product:
     build:
       context: product-server
@@ -93,15 +100,17 @@ services:
       - db
     ports:
       - "8084:8084"
-    environment:
-      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
-      spring.datasource.url: jdbc:postgresql://db:5432/postgres
-      spring.config.import: configserver:http://config:8888
-
-#      pushgateway.base-url: 172.17.0.1:9092
-#      spring.zipkin.baseUrl: http://172.17.0.1:9411
-#    command: sh wait-for.sh config:8888 -- java -jar application.jar
-
+    networks:
+      - test
+  #    environment:
+  #      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+  #      spring.datasource.url: jdbc:postgresql://db:5432/postgres
+  #      spring.config.import: configserver:http://config:8888
+  #
+  #      pushgateway.base-url: 172.17.0.1:9092
+  #      spring.zipkin.baseUrl: http://172.17.0.1:9411
+  #    command: sh wait-for.sh config:8888 -- java -jar application.jar
+  #
   order:
     build:
       context: order-server
@@ -114,11 +123,13 @@ services:
       - db
     ports:
       - "8085:8085"
-    environment:
-      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
-      spring.config.import: configserver:http://config:8888
-#      spring.datasource.url: jdbc:postgresql://db:5432/postgres
-
+    networks:
+      - test
+  #    environment:
+  #      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+  #      spring.config.import: configserver:http://config:8888
+  ##      spring.datasource.url: jdbc:postgresql://db:5432/postgres
+  #
   user:
     build:
       context: user-server
@@ -131,19 +142,21 @@ services:
       - db
     ports:
       - "8086:8086"
+    networks:
+      - test
 
-  user_tests:
-    build:
-      context: user-server
-      dockerfile: Dockerfile
-      target: test
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-#    environment:
-#      spring.config.import: configserver:http://localhost:8888
-    depends_on:
-      - config
-    network_mode: host
+  #  user_tests:
+  #    build:
+  #      context: user-server
+  #      dockerfile: Dockerfile
+  #      target: test
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  ##    environment:
+  ##      spring.config.import: configserver:http://localhost:8888
+  #    depends_on:
+  #      - config
+  #    network_mode: host
 
 
   db:
@@ -155,6 +168,8 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
+    networks:
+      - test
 #    depends_on:
 #      test_app:
 #        condition: service_completed_successfully
@@ -163,5 +178,3 @@ services:
 #      interval: 10s
 #      timeout: 5s
 #      retries: 5
-
-
