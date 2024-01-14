@@ -4,8 +4,9 @@ import lombok.Data;
 import ru.itmo.userserver.util.enums.Role;
 
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "roles")

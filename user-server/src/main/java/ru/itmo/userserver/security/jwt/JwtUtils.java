@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import ru.itmo.userserver.service.impl.UserDetailsImpl;
 import static org.springframework.util.StringUtils.hasText;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+//
+//import javax.servlet.http.Cookie;
+//import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Component
@@ -31,22 +31,22 @@ public class JwtUtils {
     @Value("${jwt.header}")
     private String jwtCookie;
 
-    public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
-    }
+//    public String getJwtFromCookies(HttpServletRequest request) {
+//        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+//        if (cookie != null) {
+//            return cookie.getValue();
+//        } else {
+//            return null;
+//        }
+//    }
 
-    public String getTokenFromRequest(HttpServletRequest request) {
-        String bearer = request.getHeader(AUTHORIZATION);
-        if (hasText(bearer) && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
-        }
-        return null;
-    }
+//    public String getTokenFromRequest(HttpServletRequest request) {
+//        String bearer = request.getHeader(AUTHORIZATION);
+//        if (hasText(bearer) && bearer.startsWith("Bearer ")) {
+//            return bearer.substring(7);
+//        }
+//        return null;
+//    }
 
 
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {

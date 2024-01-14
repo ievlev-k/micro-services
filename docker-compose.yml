@@ -49,7 +49,7 @@ services:
       target: run
     container_name: config
     ports:
-      - "8888:8888"
+      - "4566:4566"
     networks:
       - test
 
@@ -145,18 +145,17 @@ services:
     networks:
       - test
 
-  #  user_tests:
-  #    build:
-  #      context: user-server
-  #      dockerfile: Dockerfile
-  #      target: test
-  #    volumes:
-  #      - /var/run/docker.sock:/var/run/docker.sock
-  ##    environment:
-  ##      spring.config.import: configserver:http://localhost:8888
-  #    depends_on:
-  #      - config
-  #    network_mode: host
+
+  user_tests:
+    build:
+      context: user-server
+      dockerfile: Dockerfile
+      target: test
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#    environment:
+#      spring.config.import: configserver:http://localhost:8888
+    network_mode: host
 
 
   db:

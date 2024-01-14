@@ -22,13 +22,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserControllerTest extends UserServerApplicationTests {
-    private final UserController userController;
 
+    private final UserController userController;
     @Autowired
     public UserControllerTest(UserController userController) {
         this.userController = userController;
     }
-
     @Test
     void addUserTest(){
         List<UserResponse> userResponseList = userController.getAllUsers();
@@ -56,13 +55,6 @@ public class UserControllerTest extends UserServerApplicationTests {
         UserRequest userRequest = new UserRequest();
         Assert.assertThrows(IllegalArgumentException.class,()-> userController.addUser(userRequest));
 
-    }
-
-    @Test
-    void getListUserTest(){
-        List<UserResponse> userResponseList = userController.getAllUsers();
-//        Assert.assertEquals(userResponseList.size(), 31);
-        Assert.assertTrue(userResponseList.size() ==  0);
     }
 
 

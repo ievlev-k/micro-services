@@ -20,43 +20,43 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/user")
+//@RequestMapping(value = "/api/v1/user")
 public class UserController {
     private final UserService userService;
-    private final UserDetailsServiceImpl userDetailsService;
+
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public Page<UserResponse> getAllUsers(@PageableDefault(size = 5) Pageable pageable) {
         return userService.getAllPage(pageable);
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public List<UserResponse> getAllUsers() {
 //        System.out.println(token);
         return userService.getAllList();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public UserResponse getUserById(@PathVariable Long id) {
         return userService.findById(id);
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public void addUser(@Valid @RequestBody UserRequest userRequest) {
         userService.save(userRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public void updateUser(@Valid @RequestBody UserUpdate userUpdate) {
         userService.update(userUpdate);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
     }
