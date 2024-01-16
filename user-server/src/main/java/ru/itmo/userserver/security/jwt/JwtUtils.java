@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import ru.itmo.userserver.service.impl.UserDetailsImpl;
+//import ru.itmo.userserver.service.impl.UserDetailsImpl;
 import static org.springframework.util.StringUtils.hasText;
 //
 //import javax.servlet.http.Cookie;
@@ -49,10 +49,10 @@ public class JwtUtils {
 //    }
 
 
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        return ResponseCookie.from(jwtCookie, jwt).maxAge(24 * 60 * 60).httpOnly(true).build();
-    }
+//    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
+//        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
+//        return ResponseCookie.from(jwtCookie, jwt).maxAge(24 * 60 * 60).httpOnly(true).build();
+//    }
 
     public ResponseCookie getCleanJwtCookie() {
         return ResponseCookie.from(jwtCookie, null).build();
