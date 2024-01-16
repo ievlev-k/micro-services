@@ -89,42 +89,43 @@ services:
       - test
   #
   product:
-    build:
-      context: product-server
-      dockerfile: Dockerfile
-      target: run
-    container_name: product
-    depends_on:
-      - config
-      - eureka
-      - db
-    ports:
-      - "8084:8084"
-    networks:
-      - test
-  #    environment:
-  #      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
-  #      spring.datasource.url: jdbc:postgresql://db:5432/postgres
-  #      spring.config.import: configserver:http://config:8888
-  #
+   build:
+     context: product-server
+     dockerfile: Dockerfile
+     target: run
+   container_name: product
+   depends_on:
+     - config
+     - eureka
+     - db
+     - user
+   ports:
+     - "8084:8084"
+   networks:
+     - test
+    #  environment:
+    #    eureka.client.service-url.defaultZone: http://eureka:8081/eureka
+    #    spring.datasource.url: jdbc:postgresql://db:5432/postgres
+    #    spring.config.import: configserver:http://config:8888
+  
   #      pushgateway.base-url: 172.17.0.1:9092
   #      spring.zipkin.baseUrl: http://172.17.0.1:9411
   #    command: sh wait-for.sh config:8888 -- java -jar application.jar
   #
-  order:
-    build:
-      context: order-server
-      dockerfile: Dockerfile
-      target: run
-    container_name: order
-    depends_on:
-      - config
-      - eureka
-      - db
-    ports:
-      - "8085:8085"
-    networks:
-      - test
+#  order:
+#    build:
+#      context: order-server
+#      dockerfile: Dockerfile
+#      target: run
+#    container_name: order
+#    depends_on:
+#      - config
+#      - eureka
+#      - db
+#    ports:
+#      - "8085:8085"
+#    networks:
+#      - test
   #    environment:
   #      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
   #      spring.config.import: configserver:http://config:8888
@@ -140,22 +141,23 @@ services:
       - config
       - eureka
       - db
+      - gateway
     ports:
       - "8086:8086"
     networks:
       - test
 
 
-  user_tests:
-    build:
-      context: user-server
-      dockerfile: Dockerfile
-      target: test
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-#    environment:
-#      spring.config.import: configserver:http://localhost:8888
-    network_mode: host
+#  user_tests:
+#    build:
+#      context: user-server
+#      dockerfile: Dockerfile
+#      target: test
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+##    environment:
+##      spring.config.import: configserver:http://localhost:8888
+#    network_mode: host
 
 
   db:
