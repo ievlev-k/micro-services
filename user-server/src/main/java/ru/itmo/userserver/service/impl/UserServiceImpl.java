@@ -1,6 +1,7 @@
 package ru.itmo.userserver.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,22 @@ import ru.itmo.userserver.repository.UserRepository;
 import ru.itmo.userserver.service.UserService;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder encoder;
+    private final PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,PasswordEncoder passwordEncoder, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
+    }
 
     @Override
     public Flux<UserResponse> getAllPage(Pageable pageable) {
@@ -49,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<UserResponse> findById(Long id) {
+    public Mono<UserResponse> findById(UUID id) {
         return Mono.fromCallable(() -> userRepository.findById(id))
                 .subscribeOn(Schedulers.boundedElastic())
                 .map(Optional::get)
@@ -69,19 +78,13 @@ public class UserServiceImpl implements UserService {
     }
 //
     @Override
-    public Mono<Void> save(Mono<UserRequest> userRequest) {
-
-
-        return userRequest.flatMap(userRequest1 ->
-                Mono.fromCallable(()->userRepository.save(userMapper.userRequestToUser(userRequest1))))
-                .subscribeOn(Schedulers.boundedElastic()).then();
-//        User user = userMapper.userRequestToUser(userRequest);
-//        user.setPassword(encoder.encode(user.getPassword()));
-//        userRepository.save(user);
+    public UserResponse save(User user) {
+        user.setId(UUID.randomUUID());
+        return userMapper.userToUserResponse(userRepository.save(user));
     }
 //
     @Override
-    public Mono<Void> deleteById(Long id) {
+    public Mono<Void> deleteById(UUID id) {
 
         return Mono.fromCallable(() -> userRepository.findById(id))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -90,6 +93,30 @@ public class UserServiceImpl implements UserService {
                 subscribeOn(Schedulers.boundedElastic()).then();
 
     }
+
+    @Override
+    public User findByUsernameAndPassword(String username, String password) {
+        return userRepository.findByUsername(username)
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()))
+                .orElseThrow(() -> new ObjectNotFoundException("Cannot find user with current login: " + username));
+    }
+
+    @Override
+    public UUID createUser(User user) {
+        System.out.println("creating....");
+        var toSave = user.toBuilder()
+                .id(UUID.randomUUID())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .build();
+        return userRepository.save(toSave).getId();
+    }
+
+    @Override
+    public User findUserById(UUID id) {
+        return userRepository.findUserById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Cannot find user with current id: " + id.toString()));
+    }
+
 
 //
 //    @Override

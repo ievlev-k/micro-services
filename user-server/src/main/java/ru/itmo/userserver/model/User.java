@@ -4,10 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 import ru.itmo.userserver.util.enums.UserStatus;
@@ -16,6 +13,7 @@ import jakarta.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 
 @Getter
@@ -23,12 +21,13 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "users", schema = "public")
 @NoArgsConstructor
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    @NotNull
+    private UUID id;
 
     @NotBlank(message = "username is mandatory")
     @Column(name = "username", unique = true)
@@ -69,8 +68,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @NotNull(message = "Role is mandatory")
-    @ManyToOne
-    @JoinColumn(name = "role")
-    private RoleEntity role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    @NotNull
+    private Role role;
 }

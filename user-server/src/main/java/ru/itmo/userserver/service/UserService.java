@@ -12,21 +12,28 @@ import ru.itmo.userserver.dto.update.UserUpdate;
 import ru.itmo.userserver.model.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
     Flux<UserResponse> getAllPage(Pageable pageable);
 
     Flux<UserResponse> getAllList();
 
-    Mono<UserResponse> findById(Long id);
+    Mono<UserResponse> findById(UUID id);
 //
 //    UserResponse findById(Long id);
 //
-    Mono<Void> save(Mono<UserRequest> userRequest);
+    UserResponse save(User user);
 //
     Mono<Void> update(Mono<UserUpdate> userUpdate);
 //
-    Mono<Void> deleteById(Long id);
+    Mono<Void> deleteById(UUID id);
+
+    User findByUsernameAndPassword(String login, String password);
+
+    UUID createUser(User user);
+
+    User findUserById(UUID id);
 //
 //    boolean userById(Long id);
 //
