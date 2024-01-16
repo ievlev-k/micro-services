@@ -1,20 +1,25 @@
 package ru.itmo.userserver.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import ru.itmo.userserver.model.Role;
 import ru.itmo.userserver.util.enums.UserStatus;
 
+import java.util.UUID;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
+@Getter
+@Setter
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserRequest {
 
-    private Long id;
+    private UUID id;
 
     @NotBlank(message = "Username is mandatory")
     private String username;
@@ -26,7 +31,7 @@ public class UserRequest {
     private UserStatus status;
 
     @NotNull(message =  "Role is mandatory")
-    private Integer roleId;
+    private Role role;
 
     @NotBlank(message = "phone is mandatory")
     private String phone;

@@ -1,33 +1,48 @@
-package ru.itmo.userserver.contriller;
+package ru.itmo.userserver.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 //import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.itmo.userserver.dto.request.UserRequest;
 import ru.itmo.userserver.dto.response.UserResponse;
 import ru.itmo.userserver.dto.update.UserUpdate;
-import ru.itmo.userserver.model.User;
+import ru.itmo.userserver.mapper.UserMapper;
+import ru.itmo.userserver.model.Role;
+import ru.itmo.userserver.service.JWTService;
 import ru.itmo.userserver.service.UserService;
-import ru.itmo.userserver.service.impl.UserDetailsServiceImpl;
+import ru.itmo.userserver.util.Util;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/user")
 public class UserController {
     private final UserService userService;
+    private final JWTService jwtService;
+    private final UserMapper userMapper;
+
+
+    private UUID getUserLogin(String token, Role role){
+        if (token != null && token.length() >= 7) {
+            var user = jwtService.getUserDetails(Util.getBearerToken(token));
+            if (user.getRole().equals(role))
+                return user.getId();
+        }
+        return null;
+    }
 
     @GetMapping
 //    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
@@ -49,14 +64,20 @@ public class UserController {
 //
     @GetMapping("/{id}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public Mono<UserResponse> getUserById(@PathVariable Long id) {
+    public Mono<UserResponse> getUserById(@PathVariable UUID id) {
         return userService.findById(id);
     }
 //
     @PostMapping
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public Mono<Void> addUser(@Valid @RequestBody Mono<UserRequest> userRequest) {
-       return   userService.save(userRequest);
+    public Mono<ResponseEntity<UserResponse>> addUser(@RequestHeader("Authorization") String token, @RequestBody UserRequest userRequest) {
+        
+        if (getUserLogin(token, Role.ADMIN) == null) {
+            return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body(null));
+        }
+        System.out.println("pass check permission");
+        return Mono.just(ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.save(userMapper.userRequestToUser(userRequest))));
     }
 //
     @PutMapping
@@ -67,7 +88,7 @@ public class UserController {
 //
     @DeleteMapping("/{id}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    public Mono<Void> deleteUser(@PathVariable Long id) {
+    public Mono<Void> deleteUser(@PathVariable UUID id) {
         return userService.deleteById(id);
     }
 //

@@ -1,9 +1,11 @@
 package ru.itmo.userserver.dto.response;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.itmo.userserver.model.RoleEntity;
+import ru.itmo.userserver.model.Role;
 import ru.itmo.userserver.util.enums.UserStatus;
 
 @Data
@@ -11,8 +13,8 @@ import ru.itmo.userserver.util.enums.UserStatus;
 @AllArgsConstructor
 public class UserResponse {
 
-    private Long id;
+    private UUID id;
     private String username;
-    private RoleEntity role;
+    private Role role;
     private UserStatus userStatus;
 }

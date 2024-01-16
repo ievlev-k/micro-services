@@ -21,34 +21,6 @@ create table attachments
     create_date varchar(255),
     type        varchar(255) not null
 );
-
-create table roles
-(
-    id   bigserial PRIMARY KEY,
-    role varchar(256) NOT NULL
-);
-
-create table users
-(
-    id           bigserial primary key,
-    email        varchar(255) not null
-        constraint uk_6dotkott2kjsp8vw4d0m25fb7
-            unique,
-    user_status  varchar(128) NOT NULL,
-    role         int,
-    room         bigint       not null,
-    social_media varchar(255) not null,
-    phone        varchar(255) not null,
-    first_name   varchar(255) not null,
-    last_name    varchar(255),
-    password     varchar(255) not null,
-    username     varchar(255) not null
-        constraint uk_r43af9ap4edm43mmtq01oddj6
-            unique,
-    FOREIGN KEY (role) REFERENCES roles (id)
-
-);
-
 create table orders
 (
     id            bigserial primary key,
