@@ -1,7 +1,7 @@
-insert into users(email, user_status, role ,room, social_media, phone, first_name, last_name, password, username)
+insert into users(id, email, user_status, role ,room, social_media, phone, first_name, last_name, password, username)
 values
-    ('admin@gmail.com','ACTIVE', 'ADMIN',1, 'vk.com/admin', '89123456789', 'admin', 'admin','$2a$10$2MIyJH.1was2rThai9t2Huyisdw/WMtbJyAyEgkUVnfi5N2BVZIT6', 'admin'),
-    ('kirill@gmail.com','ACTIVE', 'USER',1, 'vk.com/kirill', '89123456999', 'kirill', 'kirill','$2a$10$2MIyJH.1was2rThai9t2Huyisdw/WMtbJyAyEgkUVnfi5N2BVZIT6', 'kirill');
+    ('62657586-9d98-4831-bbf0-0bca247d5d78', 'admin@gmail.com','ACTIVE', 'ADMIN',1, 'vk.com/admin', '89123456789', 'admin', 'admin','$2a$10$2MIyJH.1was2rThai9t2Huyisdw/WMtbJyAyEgkUVnfi5N2BVZIT6', 'admin'),
+    ('745b8307-00b5-47c7-b8c3-80a0ba0267b5', 'kirill@gmail.com','ACTIVE', 'USER',1, 'vk.com/kirill', '89123456999', 'kirill', 'kirill','$2a$10$2MIyJH.1was2rThai9t2Huyisdw/WMtbJyAyEgkUVnfi5N2BVZIT6', 'kirill');
 
 INSERT INTO users (user_status, role, email, room, social_media, phone, first_name, last_name, password, username)
 VALUES

@@ -1,15 +1,11 @@
 package ru.itmo.userserver.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.itmo.userserver.dto.request.LoginRequest;
 import ru.itmo.userserver.dto.request.UserRequest;

@@ -3,7 +3,6 @@ package ru.itmp.productserver.controller;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,47 +35,50 @@ public class AttachmentController {
     public String test() {
         return "test2";
     }
-
+    
     @PostMapping
     public ResponseEntity<AttachmentResponse> addAttachment(@RequestBody AttachmentRequest attachmentRequest, @RequestHeader("Authorization") String token) {
         System.out.println("token: " + token);
         
-        // if (!authFeign.checkAdminPermission(token)) {
-        //     System.out.println("checkAdminPermission: false");
-        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        // }
+        if (!authFeign.checkAdminPermission(token)) {
+            System.out.println("checkAdminPermission: false");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         System.out.println("checkAdminPermission: true");
         return new ResponseEntity<>(attachmentService.save(attachmentRequest), HttpStatus.CREATED);
     }
 
-    // @GetMapping
-    // @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    // public Page<AttachmentResponse> getListAttachment(@PageableDefault(size = 5) Pageable pageable) {
-    //     return attachmentService.getAllPage(pageable);
-    // }
+    @GetMapping
+    public ResponseEntity<Page<AttachmentResponse>> getListAttachment(@PageableDefault(size = 5) Pageable pageable) {
+        
+        return ResponseEntity.ok(attachmentService.getAllPage(pageable));
+    }
 
-    // @GetMapping("/all")
-    // @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    // public List<AttachmentResponse> getAllAttachment() {
-    //     return attachmentService.getAllList();
-    // }
+    @GetMapping("/all")
+    public ResponseEntity<List<AttachmentResponse>> getAllAttachment() {
+        return ResponseEntity.ok(attachmentService.getAllList());
+    }
 
-    // @PutMapping
-    // @PreAuthorize("hasAnyAuthority('ADMIN')")
-    // public AttachmentResponse updateAttachment(@Valid @RequestBody AttachmentUpdate attachmentUpdate) {
-    //     return attachmentService.update(attachmentUpdate);
-    // }
+    @PutMapping
+    public ResponseEntity<AttachmentResponse> updateAttachment(@RequestBody AttachmentUpdate attachmentUpdate, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return new ResponseEntity<>(attachmentService.update(attachmentUpdate), HttpStatus.OK);
+    }
 
-    // @GetMapping("/{id}")
-    // @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    // public AttachmentResponse getAttachmentDetail(@PathVariable Long id) {
-    //     return attachmentService.findAttachmentById(id);
-    // }
+    @GetMapping("/{id}")
+    public ResponseEntity<AttachmentResponse> getAttachmentDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(attachmentService.findAttachmentById(id));
+    }
 
-    // @DeleteMapping("/{id}")
-    // @PreAuthorize("hasAnyAuthority('ADMIN')")
-    // public void deleteAttachment(@PathVariable Long id) {
-    //     attachmentService.deleteById(id);
-    // }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteAttachment(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        attachmentService.deleteById(id);
+        return ResponseEntity.ok("Attachment deleted successfully");
+    }
 
 }

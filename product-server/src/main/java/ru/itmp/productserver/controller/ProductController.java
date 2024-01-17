@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-//import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.itmp.productserver.dto.request.ProductRequest;
 import ru.itmp.productserver.dto.responce.ProductResponse;
@@ -25,53 +23,61 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final AuthFeignClient authFeign;
 
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ProductResponse addProduct(@Valid @RequestBody ProductRequest productRequest) {
-        return productService.save(productRequest);
+    public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest productRequest, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            System.out.println("checkAdminPermission: false");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return new ResponseEntity<>(productService.save(productRequest), HttpStatus.CREATED);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Page<ProductResponse> getPageProduct(@PageableDefault(size = 5) Pageable pageable) {
-        return productService.getPageProduct(pageable);
+    public ResponseEntity<Page<ProductResponse>> getPageProduct(@PageableDefault(size = 5) Pageable pageable) {
+        return ResponseEntity.ok(productService.getPageProduct(pageable));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public ProductResponse getProductById(@PathVariable Long id) {
-        return productService.findById(id);
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.findById(id));
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public List<ProductResponse> getAllProduct() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<ProductResponse>> getAllProduct() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @PutMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ProductResponse updateProduct(@Valid @RequestBody ProductUpdate productUpdate) {
-        return productService.update(productUpdate);
+    public ProductResponse updateProduct(@RequestBody ProductUpdate productUpdate, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return new ResponseEntity<>(productService.update(productUpdate), HttpStatus.OK);
     }
 
-    @PostMapping("/find-all")
-//    @ResponseBody
-    public List<Product> getAllProductsByIds(@RequestBody List<Long> ids){
-        return productService.findAllById(ids);
+    @PostMapping("/list")
+    public ResponseEntity<List<Product>> getAllProductsByIds(@RequestBody List<Long> ids){
+        return ResponseEntity.ok(productService.findAllById(ids));
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public void deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         productService.deleteById(id);
+        return ResponseEntity.ok("Product deleted successfully");
     }
 
-    @PostMapping("/add-attachment")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public void addAttachmentsForProduct(@Valid @RequestBody ProductAttachmentsDto request) {
+    @PostMapping("/attachment")
+    public ResponseEntity<String> addAttachmentsForProduct(@Valid @RequestBody ProductAttachmentsDto request, @RequestHeader("Authorization") String token) {
+        if (!authFeign.checkAdminPermission(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         productService.addAttachmentsByIdForProduct(request.getProductId(), request.getAttachmentIds());
+        return ResponseEntity.ok("Attachments added successfully");
     }
 }

@@ -5,14 +5,6 @@ create table categories
     short_name varchar(255)
 );
 
-create table payments
-(
-    id          bigserial primary key,
-    create_date varchar(255),
-    description varchar(255),
-    status      bigint not null,
-    amount      bigint not null
-);
 
 create table attachments
 (
@@ -21,34 +13,18 @@ create table attachments
     create_date varchar(255),
     type        varchar(255) not null
 );
-create table orders
-(
-    id            bigserial primary key,
-    delivery_info varchar(255),
-    payment_id    bigint not null references payments,
-    user_id       bigint not null references users
-);
 
 create table products
 (
     id          bigserial primary key,
     description varchar(255) not null,
     category_id bigint       NOT NULL,
-    user_id     bigint       NoT NULL,
+    user_id     uuid       NoT NULL,
     name        varchar(255) not null,
     price       int          not null,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (category_id) REFERENCES categories (id)
 
-);
-
-create table order_products
-(
-    order_id   bigint not null,
-    product_id bigint not null,
-    primary key (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES orders (id),
-    FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 create table product_attachments
