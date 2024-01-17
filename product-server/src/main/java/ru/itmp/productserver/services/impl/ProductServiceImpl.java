@@ -87,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
         attachmentsId.removeAll(attachmentsIdByProduct);
         List<Attachment> attachments = attachmentRepository.findAllById(attachmentsId);
         product.getAttachments().addAll(attachments);
+        System.out.println(product.getAttachments().size());
         productRepository.save(product);
     }
 }

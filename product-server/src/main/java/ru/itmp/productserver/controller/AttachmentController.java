@@ -37,14 +37,10 @@ public class AttachmentController {
     }
     
     @PostMapping
-    public ResponseEntity<AttachmentResponse> addAttachment(@RequestBody AttachmentRequest attachmentRequest, @RequestHeader("Authorization") String token) {
-        System.out.println("token: " + token);
-        
+    public ResponseEntity<AttachmentResponse> addAttachment(@RequestBody AttachmentRequest attachmentRequest, @RequestHeader("Authorization") String token) {        
         if (!authFeign.checkAdminPermission(token)) {
-            System.out.println("checkAdminPermission: false");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        System.out.println("checkAdminPermission: true");
         return new ResponseEntity<>(attachmentService.save(attachmentRequest), HttpStatus.CREATED);
     }
 

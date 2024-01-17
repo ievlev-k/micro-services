@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -25,9 +26,8 @@ public class Product {
     private String name;
 
     @NotNull(message = "user is mandatory")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private UUID user;
 
     @NotNull(message = "Category is mandatory")
     @ManyToOne

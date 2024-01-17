@@ -21,11 +21,9 @@ public class Attachment {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank
     @Column(name = "base64")
     private String base64;
 
-    @NotNull
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private AttachmentType type;

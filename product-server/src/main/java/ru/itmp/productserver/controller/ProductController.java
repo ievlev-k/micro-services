@@ -12,7 +12,10 @@ import ru.itmp.productserver.dto.update.ProductUpdate;
 import ru.itmp.productserver.model.ProductAttachmentsDto;
 import ru.itmp.productserver.services.ProductService;
 import ru.itmp.productserver.model.Product;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import ru.itmp.productserver.feign.AuthFeignClient;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -51,7 +54,7 @@ public class ProductController {
     }
 
     @PutMapping
-    public ProductResponse updateProduct(@RequestBody ProductUpdate productUpdate, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ProductResponse> updateProduct(@RequestBody ProductUpdate productUpdate, @RequestHeader("Authorization") String token) {
         if (!authFeign.checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
@@ -73,7 +76,7 @@ public class ProductController {
     }
 
     @PostMapping("/attachment")
-    public ResponseEntity<String> addAttachmentsForProduct(@Valid @RequestBody ProductAttachmentsDto request, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> addAttachmentsForProduct(@RequestBody ProductAttachmentsDto request, @RequestHeader("Authorization") String token) {
         if (!authFeign.checkAdminPermission(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }

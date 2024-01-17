@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class ProductRequest {
     private String name;
 
     @NotNull(message = "userId must be not null")
-    private Long userId;
+    private UUID userId;
 
     @NotNull(message = "category must be not null")
     private Long categoryId;

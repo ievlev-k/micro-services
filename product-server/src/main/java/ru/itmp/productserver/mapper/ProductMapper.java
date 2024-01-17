@@ -32,7 +32,7 @@ public class ProductMapper {
         return context -> {
             Product source = context.getSource();
             ProductResponse destination = context.getDestination();
-            destination.setUser(source.getUser().getId());
+            destination.setUser(source.getUser());
             destination.setCategory(source.getCategory().getId());
             return context.getDestination();
         };

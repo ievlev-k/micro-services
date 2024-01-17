@@ -17,10 +17,8 @@ public class AttachmentRequest {
 
     private Long id;
 
-    @NotBlank
     private String base64;
 
-    @NotNull
     private AttachmentType type;
 
     private String createDate;

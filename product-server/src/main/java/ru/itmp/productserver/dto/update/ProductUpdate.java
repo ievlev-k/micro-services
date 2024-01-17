@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.util.UUID;
+
 
 @Data
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class ProductUpdate {
     private String name;
 
     @NotNull(message = "userId must be not null")
-    private Long userId;
+    private UUID userId;
 
     @NotNull(message = "category must be not null")
     private Long categoryId;

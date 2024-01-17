@@ -11,7 +11,9 @@ import ru.itmp.productserver.dto.responce.CategoryResponse;
 import ru.itmp.productserver.dto.update.CategoryUpdate;
 import ru.itmp.productserver.services.CategoryService;
 import ru.itmp.productserver.feign.AuthFeignClient;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
 import java.util.List;
