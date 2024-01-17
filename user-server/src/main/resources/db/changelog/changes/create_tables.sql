@@ -17,3 +17,13 @@ create table users
         unique
 
 );
+
+
+create table payments
+(
+    id          bigserial primary key,
+    create_date varchar(255),
+    description varchar(255),
+    status bigint not null,
+    amount bigint not null
+);
