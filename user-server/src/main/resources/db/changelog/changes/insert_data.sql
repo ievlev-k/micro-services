@@ -34,4 +34,3 @@ VALUES
     ('ACTIVE', 'ADMIN', 'email28@example.com', 150, 'social_media28', '1234567898', 'Lily', 'Morris', 'password28', 'lily.morris28'),
     ('ACTIVE', 'ADMIN', 'email29@example.com', 151, 'social_media29', '1234567899', 'Daniel', 'Bell', 'password29', 'daniel.bell29'),
     ('ACTIVE', 'ADMIN', 'email30@example.com', 152, 'social_media30', '1234567890', 'Emily', 'Cook', 'password30', 'emily.cook30');
-
