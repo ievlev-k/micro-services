@@ -11,13 +11,17 @@ import ru.itmo.orderserver.dto.update.PaymentUpdate;
 import java.util.List;
 
 public interface PaymentService {
-//    PaymentResponse save (PaymentRequest paymentRequest);
+    Mono<PaymentResponse> save (PaymentRequest paymentRequest);
 //    Page<PaymentResponse> getAllPage(Pageable pageable);
     Flux<PaymentResponse> getAllPayment();
 
-//    PaymentResponse update(PaymentUpdate paymentUpdate);
+    Mono<PaymentResponse> update(PaymentUpdate paymentUpdate);
 //
-//    PaymentResponse getPaymentById(Long id);
+    Mono<PaymentResponse> getPaymentById(Long id);
 //
-//    void deleteById(Long id);
+    Mono<Void> deleteById(Long id);
+
+
+    Flux<PaymentResponse> getAllPage(Pageable pageable);
+
 }

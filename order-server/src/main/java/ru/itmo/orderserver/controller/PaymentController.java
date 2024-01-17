@@ -26,17 +26,17 @@ import java.util.List;
 public class PaymentController {
     private final PaymentService paymentService;
 
-//    @PostMapping
+    @PostMapping
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-//    public PaymentResponse addPayment(@Valid @RequestBody PaymentRequest paymentRequest) {
-//        return paymentService.save(paymentRequest);
-//    }
+    public Mono<PaymentResponse> addPayment(@Valid @RequestBody PaymentRequest paymentRequest) {
+        return paymentService.save(paymentRequest);
+    }
 //
-//    @GetMapping
+    @GetMapping
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-//    public Page<PaymentResponse> getListPayment(@PageableDefault(size = 5) Pageable pageable)  {
-//        return paymentService.getAllPage(pageable);
-//    }
+    public Flux<PaymentResponse> getListPayment(@PageableDefault(size = 5) Pageable pageable)  {
+        return paymentService.getAllPage(pageable);
+    }
 
     @GetMapping("/all")
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
@@ -44,22 +44,22 @@ public class PaymentController {
         return paymentService.getAllPayment();
     }
 //
-//    @PutMapping
+    @PutMapping
 //    @PreAuthorize("hasAnyAuthority('ADMIN')")
-//    public PaymentResponse updatePayment(@Valid @RequestBody PaymentUpdate paymentUpdate){
-//        return paymentService.update(paymentUpdate);
-//    }
+    public Mono<PaymentResponse> updatePayment(@Valid @RequestBody PaymentUpdate paymentUpdate){
+        return paymentService.update(paymentUpdate);
+    }
 //
-//    @GetMapping("/{id}")
+    @GetMapping("/{id}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-//    public PaymentResponse getPaymentDetail(@PathVariable Long id) {
-//        return paymentService.getPaymentById(id);
-//    }
+    public Mono<PaymentResponse> getPaymentDetail(@PathVariable Long id) {
+        return paymentService.getPaymentById(id);
+    }
 //
-//    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN')")
-//    public void deletePayment(@PathVariable Long id) {
-//        paymentService.deleteById(id);
-//    }
+    public Mono<Void> deletePayment(@PathVariable Long id) {
+        return paymentService.deleteById(id);
+    }
 
 }
