@@ -9,7 +9,6 @@ import ru.itmp.productserver.dto.request.ProductRequest;
 import ru.itmp.productserver.dto.responce.ProductResponse;
 import ru.itmp.productserver.dto.update.ProductUpdate;
 import ru.itmp.productserver.exeptions.ObjectNotFoundException;
-import ru.itmp.productserver.feign.AuthFeignClient;
 import ru.itmp.productserver.mapper.ProductMapper;
 import ru.itmp.productserver.model.Product;
 import ru.itmp.productserver.model.Attachment;
@@ -33,16 +32,9 @@ public class ProductServiceImpl implements ProductService {
 
 
     private final ProductMapper productMapper;
-    private final AuthFeignClient authFeignClient;
 
     @Override
     public ProductResponse save(ProductRequest productRequest) {
-
-        if (!authFeignClient.findUserById(productRequest.getUserId())){
-            throw new ObjectNotFoundException("UserId: " + productRequest.getUserId() + " does not exist!");
-        }
-
-
         categoryRepository.findById(productRequest.getCategoryId())
                 .orElseThrow(() -> new ObjectNotFoundException("Category does not exist"));
 
@@ -95,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
         attachmentsId.removeAll(attachmentsIdByProduct);
         List<Attachment> attachments = attachmentRepository.findAllById(attachmentsId);
         product.getAttachments().addAll(attachments);
+        System.out.println(product.getAttachments().size());
         productRepository.save(product);
     }
 }
