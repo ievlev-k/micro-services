@@ -112,20 +112,20 @@ services:
   #      spring.zipkin.baseUrl: http://172.17.0.1:9411
   #    command: sh wait-for.sh config:8888 -- java -jar application.jar
   #
-#  order:
-#    build:
-#      context: order-server
-#      dockerfile: Dockerfile
-#      target: run
-#    container_name: order
-#    depends_on:
-#      - config
-#      - eureka
-#      - db
-#    ports:
-#      - "8085:8085"
-#    networks:
-#      - test
+  order:
+    build:
+      context: order-server
+      dockerfile: Dockerfile
+      target: run
+    container_name: order
+    depends_on:
+      - config
+      - eureka
+      - db
+    ports:
+      - "8085:8085"
+    networks:
+      - test
   #    environment:
   #      eureka.client.service-url.defaultZone: http://eureka:8081/eureka
   #      spring.config.import: configserver:http://config:8888
