@@ -1,10 +1,10 @@
 package ru.itmo.orderserver.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+
 import org.springframework.stereotype.Repository;
 import ru.itmo.orderserver.model.Payment;
 
-
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface PaymentRepository extends ReactiveCrudRepository<Payment, Long> {
 }
