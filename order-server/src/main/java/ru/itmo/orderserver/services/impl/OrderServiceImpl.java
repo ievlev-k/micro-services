@@ -13,7 +13,7 @@ import ru.itmo.orderserver.dto.request.OrderRequest;
 import ru.itmo.orderserver.dto.response.OrderResponse;
 import ru.itmo.orderserver.dto.update.OrderUpdate;
 import ru.itmo.orderserver.exeptions.ObjectNotFoundException;
-//import ru.itmo.orderserver.feign.ProductFeignClient;
+import ru.itmo.orderserver.feign.ProductFeignClient;
 import ru.itmo.orderserver.mapper.OrderMapper;
 import ru.itmo.orderserver.model.Order;
 import ru.itmo.orderserver.model.Product;
@@ -32,7 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
 //    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
-//    private final ProductFeignClient productFeignClient;
+    private final ProductFeignClient productFeignClient;
 
 
 
@@ -70,20 +70,20 @@ public class OrderServiceImpl implements OrderService {
 //        orderRepository.deleteById(id);
     }
 //
-//    @Override
-//    @Transactional
-//    public Mono<Void> addProductsByIdForOrder(Long orderId, List<Long> productIds) {
-//
-//        Order order = orderRepository.findById(orderId)
-//                .orElseThrow(() -> new ObjectNotFoundException("Order with id " + orderId + " not found"));
-//        List<Long> productIdsByOrder = order.getProducts().stream().map(Product::getId).collect(Collectors.toList());
-//        productIds.removeAll(productIdsByOrder);
-////        List<Product> products = productFeignClient.getAllProductsByIds(productIds);
-//        List<Product> products = productFeignClient.getAllProductsByIds(productIds);
-//        System.out.println(products.size());
-//        order.getProducts().addAll(products);
-//        orderRepository.save(order);
-//    }
+   @Override
+   @Transactional
+   public Mono<Void> addProductsByIdForOrder(Long orderId, List<Long> productIds) {
+        System.out.println("addProductsByIdForOrder");
+        Order order = orderRepository.findById(orderId).block();
+        System.out.println("out of block");    
+        List<Long> productIdsByOrder = order.getProducts().stream().map(Product::getId).collect(Collectors.toList());
+        productIds.removeAll(productIdsByOrder);
+        List<Product> products = productFeignClient.getAllProductsByIds(productIds);
+        System.out.println(products.size());
+        order.getProducts().addAll(products);
+        orderRepository.save(order);
+        return Mono.empty();
+    }
 
 
 }

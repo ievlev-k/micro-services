@@ -22,7 +22,6 @@ create table products
     user_id     uuid       NoT NULL,
     name        varchar(255) not null,
     price       int          not null,
-    FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (category_id) REFERENCES categories (id)
 
 );

@@ -96,9 +96,10 @@ public class OrderController {
         return ResponseEntity.ok(Mono.just("Order deleted"));
     }
 //
-//    @PostMapping("/add-product")
-////    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-//    public Mono<Void> addProductsForOrder(@Valid @RequestBody OrderProductDto request) {
-//        return orderService.addProductsByIdForOrder(request.getOrderId(), request.getProductIds());
-//    }
+    @PostMapping("/product")
+    public ResponseEntity<Mono<String>> addProductsForOrder(@RequestBody OrderProductDto request) {
+        System.out.println("Controller: ");
+        orderService.addProductsByIdForOrder(request.getOrderId(), request.getProductIds());
+        return ResponseEntity.ok(Mono.just("Products added"));
+    }
 }

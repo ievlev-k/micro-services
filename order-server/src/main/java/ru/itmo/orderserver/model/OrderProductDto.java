@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderProductDto {
     @NotNull
-    private Long order_id;
+    private Long orderId;
 
     @NotNull
     @Transient
-    private List<Long> product_id;
+    private List<Long> productIds;
 }

@@ -23,5 +23,5 @@ public interface OrderService {
 //
     Mono<Void> deleteById(Long id);
 //
-//    Mono<Void> addProductsByIdForOrder(Long orderId, List<Long> productIds);
+    Mono<Void> addProductsByIdForOrder(Long orderId, List<Long> productIds);
 }
