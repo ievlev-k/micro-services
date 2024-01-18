@@ -3,6 +3,7 @@ package ru.itmo.orderserver.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -12,8 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderProductDto {
     @NotNull
-    private Long orderId;
+    private Long order_id;
 
     @NotNull
-    private List<Long> productIds;
+    @Transient
+    private List<Long> product_id;
 }

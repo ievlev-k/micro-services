@@ -13,4 +13,5 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 @Repository
 public interface OrderRepository extends ReactiveCrudRepository<Order, Long> {
+    Flux<Order> findAllBy(Pageable pageable);
 }

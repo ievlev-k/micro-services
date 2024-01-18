@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.itmo.orderserver.dto.request.OrderRequest;
 import ru.itmo.orderserver.dto.response.OrderResponse;
 import ru.itmo.orderserver.dto.update.OrderUpdate;
@@ -34,18 +36,15 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-//    @Override
-//    public OrderResponse addOrder(OrderRequest orderRequest) {
-//        Order order = orderMapper.orderRequestToOrder(orderRequest);
-//        paymentRepository.findById(orderRequest.getPaymentId())
-//                .orElseThrow(() -> new ObjectNotFoundException("PaymentId: " + orderRequest.getPaymentId() + " not exist"));
-//        return orderMapper.orderToOrderResponse(orderRepository.save(order));
-//    }
-//
-//    @Override
-//    public Page<OrderResponse> getAllPage(Pageable pageable) {
-//        return orderMapper.orderToOrderResponsePage(orderRepository.findAll(pageable));
-//    }
+    @Override
+    public Mono<OrderResponse> addOrder(OrderRequest orderRequest) {
+        return orderRepository.save(orderMapper.orderRequestToOrder(orderRequest)).map(orderMapper::orderToOrderResponse);
+    }
+
+    @Override
+    public Flux<OrderResponse> getAllPage(Pageable pageable) {
+        return orderRepository.findAllBy(pageable).map(orderMapper::orderToOrderResponse);
+    }
 
     @Override
     public Flux<OrderResponse> getAllOrder() {
@@ -53,28 +52,28 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAll().map(orderMapper::orderToOrderResponse);
     }
 //
-//    @Override
-//    public OrderResponse update(OrderUpdate orderUpdate) {
-//        Order order = orderMapper.orderUpdateToOrder(orderUpdate);
-//        return orderMapper.orderToOrderResponse(orderRepository.save(order));
-//    }
+    @Override
+    public Mono<OrderResponse> update(OrderUpdate orderUpdate) {
+        return orderRepository.save(orderMapper.orderUpdateToOrder(orderUpdate)).map(orderMapper::orderToOrderResponse);
+    }
 
-//    @Override
-//    public OrderResponse getOrderDetail(Long id) {
-//        return orderMapper.orderToOrderResponse(orderRepository
-//                .findById(id)
-//                .orElseThrow(() -> new ObjectNotFoundException("Order with id " + id + " not found"))
-//        );
-//    }
+    @Override
+    public Mono<OrderResponse> getOrderDetail(Long id) {
+        return orderRepository.findById(id).map(orderMapper::orderToOrderResponse);
+    }
 //
-//    @Override
-//    public void deleteById(Long id) {
+    @Override
+    public Mono<Void> deleteById(Long id) {
+        return orderRepository.findById(id).subscribeOn(Schedulers.boundedElastic())
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundException("not order")))
+                                .then(orderRepository.deleteById(id)).then();
 //        orderRepository.deleteById(id);
-//    }
+    }
 //
 //    @Override
 //    @Transactional
-//    public void addProductsByIdForOrder(Long orderId, List<Long> productIds) {
+//    public Mono<Void> addProductsByIdForOrder(Long orderId, List<Long> productIds) {
+//
 //        Order order = orderRepository.findById(orderId)
 //                .orElseThrow(() -> new ObjectNotFoundException("Order with id " + orderId + " not found"));
 //        List<Long> productIdsByOrder = order.getProducts().stream().map(Product::getId).collect(Collectors.toList());

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderUpdate {
     private Long id;
-    private Long userId;
-    private Long paymentId;
-    private String deliveryInfo;
+    private Long user_id;
+    private Long payment_id;
+    private String delivery_info;
 }

@@ -18,7 +18,7 @@ public class Payment {
 
     private long id;
 
-    private String createDate;
+    private String create_date;
 
     @NotNull(message = "status is mandatory")
     private long status;

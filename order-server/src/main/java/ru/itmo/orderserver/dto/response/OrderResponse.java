@@ -10,8 +10,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderResponse {
     private Long id;
-    private UUID user;
-    private Long payment;
-    private String deliveryInfo;
+    private UUID user_id;
+    private Long payment_id;
+    private String delivery_info;
 //    private List<Long> products;
 }

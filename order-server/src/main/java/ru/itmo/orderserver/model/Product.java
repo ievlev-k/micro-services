@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 //import javax.persistence.*;
@@ -39,6 +40,7 @@ public class Product {
 //    @JoinTable(name = "product_attachments",
 //            joinColumns = @JoinColumn(name = "product_id"),
 //            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    @Transient
     private List<Attachment> attachments;
 
 //    @ManyToMany(mappedBy = "products")

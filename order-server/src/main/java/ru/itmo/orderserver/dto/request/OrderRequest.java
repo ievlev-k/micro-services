@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 
 @Data
@@ -13,14 +14,14 @@ import javax.validation.constraints.NotNull;
 public class OrderRequest {
     private Long id;
     @NotNull
-    private Long userId;
+    private UUID user_id;
 
     @NotBlank
-    private String deliveryInfo;
+    private String delivery_info;
 
 //    @NotNull
 //    private List<Long> productIds;
 
     @NotNull
-    private Long paymentId;
+    private Long payment_id;
 }

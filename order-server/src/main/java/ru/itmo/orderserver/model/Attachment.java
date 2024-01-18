@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 import ru.itmo.orderserver.util.enums.AttachmentType;
 
@@ -30,8 +31,8 @@ public class Attachment {
     private AttachmentType type;
 
 
-    private String createDate;
+    private String create_date;
 
-
+    @Transient
     private List<Product> products;
 }

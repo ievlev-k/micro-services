@@ -24,8 +24,8 @@ public class OrderMapper {
     public void setupMapper() {
         System.out.println("setup mapper");
         modelMapper.createTypeMap(Order.class, OrderResponse.class)
-                .addMappings(m -> m.skip(OrderResponse::setUser))
-                .addMappings(m -> m.skip(OrderResponse::setPayment))
+                .addMappings(m -> m.skip(OrderResponse::setUser_id))
+                .addMappings(m -> m.skip(OrderResponse::setPayment_id))
                 .setPostConverter(toOrderResponseConverter());
     }
 
@@ -33,8 +33,8 @@ public class OrderMapper {
         return context -> {
             Order source = context.getSource();
             OrderResponse destination = context.getDestination();
-            destination.setPayment(source.getPayment().getId());
-            destination.setUser(source.getUser().getId());
+            destination.setPayment_id(source.getPayment_id());
+            destination.setUser_id(source.getUser_id());
             return context.getDestination();
         };
     }

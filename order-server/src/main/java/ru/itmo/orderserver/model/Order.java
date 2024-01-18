@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 
@@ -24,16 +27,18 @@ public class Order {
     @NotNull
 //    @ManyToOne
 //    @JoinColumn(name="user_id")
-    private User user;
+//    @Transient
+    private UUID user_id;
 
     @NotNull
 //    @OneToOne
 //    @JoinColumn(name="payment_id")
-    private Payment payment;
+//    @Transient
+    private Long payment_id;
 
 //    @Column(name = "delivery_info")
-    private String deliveryInfo;
+    private String delivery_info;
 
-
+    @Transient
     private List<Product> products;
 }

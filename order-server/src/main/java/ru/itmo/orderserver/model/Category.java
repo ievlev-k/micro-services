@@ -25,5 +25,5 @@ public class Category {
     @NotBlank
     private String name;
 
-    private String shortName;
+    private String short_name;
 }
