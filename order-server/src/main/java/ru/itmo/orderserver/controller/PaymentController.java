@@ -14,10 +14,14 @@ import ru.itmo.orderserver.dto.request.PaymentRequest;
 import ru.itmo.orderserver.dto.response.PaymentResponse;
 import ru.itmo.orderserver.dto.update.PaymentUpdate;
 import ru.itmo.orderserver.services.PaymentService;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
 import java.util.List;
+import ru.itmo.orderserver.feign.AuthFeignClient;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
 @RestController
 @Slf4j
@@ -25,41 +29,69 @@ import java.util.List;
 @RequestMapping(value="/api/v1/payment")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final AuthFeignClient authFeign;
+	private final CircuitBreaker circuitBreaker;
+
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<PaymentResponse> addPayment(@Valid @RequestBody PaymentRequest paymentRequest) {
-        return paymentService.save(paymentRequest);
+    public ResponseEntity<Mono<PaymentResponse>> addPayment(@RequestBody PaymentRequest paymentRequest, @RequestHeader("Authorization") String token) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return new ResponseEntity<>(paymentService.save(paymentRequest), HttpStatus.CREATED);
     }
-//
+
     @GetMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Flux<PaymentResponse> getListPayment(@PageableDefault(size = 5) Pageable pageable)  {
-        return paymentService.getAllPage(pageable);
+    public ResponseEntity<Flux<PaymentResponse>> getListPayment(@PageableDefault(size = 5) Pageable pageable)  {
+        return ResponseEntity.ok(paymentService.getAllPage(pageable));
     }
 
     @GetMapping("/all")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Flux<PaymentResponse> getAllPayment()  {
-        return paymentService.getAllPayment();
+    public ResponseEntity<Flux<PaymentResponse>> getAllPayment()  {
+        return ResponseEntity.ok(paymentService.getAllPayment());
     }
-//
+
     @PutMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public Mono<PaymentResponse> updatePayment(@Valid @RequestBody PaymentUpdate paymentUpdate){
-        return paymentService.update(paymentUpdate);
+    public ResponseEntity<Mono<PaymentResponse>> updatePayment(@RequestBody PaymentUpdate paymentUpdate, @RequestHeader("Authorization") String token){
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(paymentService.update(paymentUpdate));
     }
-//
+
     @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<PaymentResponse> getPaymentDetail(@PathVariable Long id) {
-        return paymentService.getPaymentById(id);
+    public ResponseEntity<Mono<PaymentResponse>> getPaymentDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(paymentService.getPaymentById(id));
     }
-//
+
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public Mono<Void> deletePayment(@PathVariable Long id) {
-        return paymentService.deleteById(id);
+    public ResponseEntity<Mono<String>> deletePayment(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        paymentService.deleteById(id);
+        return ResponseEntity.ok(Mono.just("Delete payment success"));
     }
 
 }

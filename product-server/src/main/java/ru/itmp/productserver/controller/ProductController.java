@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import ru.itmp.productserver.feign.AuthFeignClient;
 import javax.validation.Valid;
 import java.util.List;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
 @RestController
 @Slf4j
@@ -27,12 +28,19 @@ public class ProductController {
 
     private final ProductService productService;
     private final AuthFeignClient authFeign;
+	private final CircuitBreaker circuitBreaker;
 
 
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest productRequest, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
-            System.out.println("checkAdminPermission: false");
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return new ResponseEntity<>(productService.save(productRequest), HttpStatus.CREATED);
@@ -55,7 +63,14 @@ public class ProductController {
 
     @PutMapping
     public ResponseEntity<ProductResponse> updateProduct(@RequestBody ProductUpdate productUpdate, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return new ResponseEntity<>(productService.update(productUpdate), HttpStatus.OK);
@@ -68,7 +83,14 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         productService.deleteById(id);
@@ -77,7 +99,14 @@ public class ProductController {
 
     @PostMapping("/attachment")
     public ResponseEntity<String> addAttachmentsForProduct(@RequestBody ProductAttachmentsDto request, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         productService.addAttachmentsByIdForProduct(request.getProductId(), request.getAttachmentIds());

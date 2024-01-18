@@ -16,7 +16,11 @@ import ru.itmo.orderserver.dto.response.OrderResponse;
 import ru.itmo.orderserver.dto.update.OrderUpdate;
 import ru.itmo.orderserver.model.OrderProductDto;
 import ru.itmo.orderserver.services.OrderService;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import ru.itmo.orderserver.feign.AuthFeignClient;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -27,42 +31,69 @@ import java.util.List;
 @RequestMapping(value="/api/v1/order")
 public class OrderController {
     private final OrderService orderService;
+    private final AuthFeignClient authFeign;
+	private final CircuitBreaker circuitBreaker;
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<OrderResponse> addOrder(@Valid @RequestBody OrderRequest orderRequest) {
-        return orderService.addOrder(orderRequest);
+    public ResponseEntity<Mono<OrderResponse>> addOrder(@RequestBody OrderRequest orderRequest, @RequestHeader("Authorization") String token) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return new ResponseEntity<>(orderService.addOrder(orderRequest), HttpStatus.CREATED);
     }
 
 
     @GetMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Flux<OrderResponse> getOrderPage(@PageableDefault(size = 5) Pageable pageable)  {
-        return orderService.getAllPage(pageable);
+    public ResponseEntity<Flux<OrderResponse>> getOrderPage(@PageableDefault(size = 5) Pageable pageable)  {
+        return ResponseEntity.ok(orderService.getAllPage(pageable));
     }
 
     @GetMapping("/all")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Flux<OrderResponse> getAllOrder()  {
-        return orderService.getAllOrder();
+    public ResponseEntity<Flux<OrderResponse>> getAllOrder()  {
+        return ResponseEntity.ok(orderService.getAllOrder());
     }
-//
+
     @PutMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<OrderResponse> updateOrder(@Valid @RequestBody OrderUpdate orderUpdate){
-        return orderService.update(orderUpdate);
+    public ResponseEntity<Mono<OrderResponse>> updateOrder(@RequestBody OrderUpdate orderUpdate, @RequestHeader("Authorization") String token){
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(orderService.update(orderUpdate));
     }
-//
+
     @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<OrderResponse> getOrderDetail(@PathVariable Long id) {
-        return orderService.getOrderDetail(id);
+    public ResponseEntity<Mono<OrderResponse>> getOrderDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderDetail(id));
     }
-//
+
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public Mono<Void> deleteOrder(@PathVariable Long id) {
-        return orderService.deleteById(id);
+    public ResponseEntity<Mono<String>> deleteOrder(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        orderService.deleteById(id);
+        return ResponseEntity.ok(Mono.just("Order deleted"));
     }
 //
 //    @PostMapping("/add-product")

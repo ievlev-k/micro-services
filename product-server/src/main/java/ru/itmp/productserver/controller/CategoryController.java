@@ -14,6 +14,7 @@ import ru.itmp.productserver.feign.AuthFeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -25,11 +26,18 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final AuthFeignClient authFeign;
+	private final CircuitBreaker circuitBreaker;
 
     @PostMapping
     public ResponseEntity<CategoryResponse> addCategory(@RequestBody CategoryRequest categoryRequest, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
-            System.out.println("checkAdminPermission: false");
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return new ResponseEntity<>(categoryService.save(categoryRequest), HttpStatus.CREATED);
@@ -47,7 +55,14 @@ public class CategoryController {
 
     @PutMapping
     public ResponseEntity<CategoryResponse> updateCategory(@RequestBody CategoryUpdate categoryUpdate, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return new ResponseEntity<>(categoryService.update(categoryUpdate), HttpStatus.OK);
@@ -60,7 +75,14 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        if (!authFeign.checkAdminPermission(token)) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = circuitBreaker.decorateSupplier(() -> authFeign.checkAdminPermission(token)).get();
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         categoryService.deleteById(id);
